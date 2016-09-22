@@ -3,6 +3,8 @@
 Adobe Analytics aka SiteCatalyst data insertion module for Node.js<br/>
 This module allows you to push data into your Adobe Analytics reporting suite from the server side.  It uses the Data Insertion API to push your data in.
 
+This fork allows the reporting host to be set separately from the reporting suite id.
+
 ## Installation
 
   npm install adobe-analytics-di --save
@@ -13,6 +15,7 @@ Setup the analytics di api<br/>
 ```javascript
 var adobeAnalyticsHelper = require('adobe-analytics-di');
 adobeAnalyticsHelper.setReportingSuiteId("MY-REPORTING-SUITE-ID");
+adobeAnalyticsHelper.setReportingHost("MY-REPORTING-HOST");
 ```
 <br/>
 Send data to Adobe Analytics. Note that the property names are case sensitive because they get used in the XML sent to the DI API<br/>

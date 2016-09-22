@@ -19,6 +19,8 @@ var _sProps = [];
 var _persistSProps = false;
 var _reportingSuiteId=null;
 var _persistReportingSuiteId=true;
+var _reportingHost=null;
+var _persistReportingHost=true;
 var _pageName=null;
 var _persistPageName=true;
 var _defaultIpAddress = process.env.OPENSHIFT_NODEJS_IP;
@@ -55,6 +57,7 @@ var _parameters = {
     prop:{postParam:"prop",description:'Analytics property name.',multiform:true,getParam:"c",max:75},
     purchaseID:{postParam:"purchaseID",description:'Purchase ID number.',getParam:"purchaseID",multiform:false},
     referrer:{postParam:"referrer",description:'The URL of the page referrer.',getParam:"r",multiform:false},
+    reportHost:{postParam:"hostPrefix",description:'Specifies the host prefix where you want to submit data.',getParam:"",multiform:false},
     reportSuiteID:{postParam:"referrer",description:'Specifies the report suites where you want to submit data. Separate multiple report suite IDs with a comma.',getParam:"",multiform:false},
     resolution:{postParam:"resolution",description:'Monitor resolution For example, 1280x1024.',getParam:"s",multiform:false},
     server:{postParam:"server",description:'The Web server serving the page.',getParam:"server",multiform:false},
@@ -115,7 +118,7 @@ function _sendCallToAdobeAnalytics(di){
     var body = _xmlPre + di.getPostXmlRequestBody() + _xmlPost;
     //console.info(body);
     var call_options = {
-        host: self.getReportingSuiteId()+".112.2o7.net",
+        host: self.getReportingHost()+".112.2o7.net",
         port: 80,
         path: '/b/ss//6',
         method: 'POST',
@@ -217,6 +220,13 @@ function DataInsertion(data){
         data[_parameters.reportSuiteID.postParam] = _reportingSuiteId;
     }
 
+    if(_persistReportingHost && (typeof data[_parameters.reportHost.postParam] != 'undefined')){
+        _reportingHost = data[_parameters.reportHost.postParam];
+    }else if(_persistReportingHost && (typeof data[_parameters.reportHost.postParam] == 'undefined') && (_reportingHost != null)){
+        //set it to the last value used
+        data[_parameters.reportHost.postParam] = _reportingHost;
+    }
+
     if(_persistEvars){
         var callEvars = _getEvarsFromDiParameters(data);
         var mergedEvars = _.extend(_eVars,callEvars);
@@ -238,6 +248,12 @@ function DataInsertion(data){
         throw new Error('reportSuiteID is required');
     }else{
         data['reportSuiteID'] = data.reportSuiteID || _reportingSuiteId;
+    }
+    //CHECK for the definition of either reportHost on data parameter or in the helper
+    if((typeof data.reportHost == 'undefined') && (_reportingHost == null)){
+        throw new Error('reportHost is required');
+    }else{
+        data['reportHost'] = data.reportHost || _reportingHost;
     }
 
     //visitor id or ipAddress is required
@@ -322,6 +338,26 @@ var AdobeAnalyticsHelper = {
      */
     getReportingSuiteId:function(){
         return _reportingSuiteId;
+    },
+    /**
+     * @doc setReportingHost
+     * @name AdobeAnalyticsHelper:setReportingHost
+     *
+     * @description sets the reporting host
+     *
+     */
+    setReportingHost:function(reportingHost){
+        _reportingHost = reportingHost;
+    },
+    /**
+     * @doc getReportingHost
+     * @name AdobeAnalyticsHelper:getReportingHost
+     *
+     * @description gets the reporting host
+     *
+     */
+    getReportingHost:function(){
+        return _reportingHost;
     },
     /**
      * @doc getDataInsertion
