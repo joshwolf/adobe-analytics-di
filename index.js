@@ -118,7 +118,8 @@ function _sendCallToAdobeAnalytics(di){
     var body = _xmlPre + di.getPostXmlRequestBody() + _xmlPost;
     //console.info(body);
     var call_options = {
-        host: self.getReportingHost()+".112.2o7.net",
+        //host: self.getReportingHost()+".112.2o7.net",
+        host: self.getReportingHost(),
         port: 80,
         path: '/b/ss//6',
         method: 'POST',
